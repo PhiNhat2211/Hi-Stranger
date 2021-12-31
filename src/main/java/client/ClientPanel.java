@@ -350,6 +350,8 @@ public class ClientPanel extends JFrame {
 						client.setMatched(false);
 						btnEnd.setEnabled(false);
 						displayArea.setText("");
+						Message refuse = new Message(client.getName(), null, Status.MATCH);
+						client.sendMessage(refuse);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
