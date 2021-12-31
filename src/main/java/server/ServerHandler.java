@@ -131,7 +131,6 @@ public class ServerHandler extends Thread {
 		} catch (IOException | ClassNotFoundException | InterruptedException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public void sendMessage(Message mess) throws IOException {
