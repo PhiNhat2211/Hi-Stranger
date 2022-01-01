@@ -297,7 +297,7 @@ public class ClientForm extends JFrame {
 										case UNMATCH:
 											JOptionPane.showMessageDialog(null,
 													receivedMessage.getName() + " has refused the connection!", "Alert",
-													JOptionPane.ERROR_MESSAGE);
+													JOptionPane.ERROR_MESSAGE);			
 											client.setMatched(false);
 											btnEnd.setEnabled(false);
 											break;
@@ -308,8 +308,8 @@ public class ClientForm extends JFrame {
 											client.setMatched(false);
 											btnEnd.setEnabled(false);
 											displayArea.setText("");
-											Message refuse = new Message(client.getName(), null, Status.MATCH);
-											client.sendMessage(refuse);
+											Message find = new Message(client.getName(), null, Status.MATCH);
+											client.sendMessage(find);
 											break;
 										case CONNECTED:
 											btnConnect.setEnabled(false);

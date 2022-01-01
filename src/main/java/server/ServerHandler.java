@@ -61,7 +61,7 @@ public class ServerHandler extends Thread {
 						Server.listWait.remove(username);
 					} else {
 						ServerHandler b;
-						if (Server.listMatched.get(clientInfo) != null && Server.listMatched.get(clientInfo).getClientInfo() == null) {
+						if (Server.listMatched.get(clientInfo) != null && Server.listMatched.get(clientInfo).getClientInfo().equals(username)) {
 							b = Server.listMatched.get(clientInfo);
 							Message unmatch = new Message(username, null, Status.EXIT);
 							b.sendMessage(unmatch);
@@ -71,11 +71,12 @@ public class ServerHandler extends Thread {
 						Server.listMatched.remove(username);
 						Server.listWait.remove(username);
 					}
-
 					running = false;
 					break;
+					
+					
 				case OK:
-					// peerInfo = received.getName();
+					// clientInfo = received.getName();
 					break;
 				case DISCONNECT:
 					ServerHandler bx;
@@ -106,8 +107,8 @@ public class ServerHandler extends Thread {
 					if (Server.listWait.size() - 1 > rejected.size() && Server.secondClient.equals(username)) {
 						matching();
 					}
-					
 					break;
+				
 				case MATCH:
 					matching();
 					break;
