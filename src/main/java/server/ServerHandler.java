@@ -49,7 +49,6 @@ public class ServerHandler extends Thread {
 		try (socket; Input; Output;) {
 			while (running) {
 				received = (Message) Input.readObject();
-				System.out.println(received);
 				switch (received.getStatus()) {
 				case CHAT:
 					if (clientInfo != null && !clientInfo.isEmpty()) {
@@ -61,11 +60,11 @@ public class ServerHandler extends Thread {
 						Server.listWait.remove(username);
 					} else {
 						ServerHandler b;
-						if (Server.listMatched.get(clientInfo) != null && Server.listMatched.get(clientInfo).getClientInfo().equals(username)) {
+						if (Server.listMatched.get(clientInfo) != null
+								&& Server.listMatched.get(clientInfo).getClientInfo().equals(username)) {
 							b = Server.listMatched.get(clientInfo);
-							Message unmatch = new Message(username, null, Status.EXIT);
-							b.sendMessage(unmatch);
-							System.out.println("refused to send");
+							Message exit = new Message(username, null, Status.EXIT);
+							b.sendMessage(exit);
 						}
 						removeMatched();
 						Server.listMatched.remove(username);
@@ -73,18 +72,17 @@ public class ServerHandler extends Thread {
 					}
 					running = false;
 					break;
-					
-					
+
 				case OK:
-					// clientInfo = received.getName();
 					break;
+
 				case DISCONNECT:
 					ServerHandler bx;
-					if (Server.listMatched.get(clientInfo) != null) {
+					if (Server.listMatched.get(clientInfo) != null
+							&& Server.listMatched.get(clientInfo).getClientInfo().equals(username)) {
 						bx = Server.listMatched.get(clientInfo);
-						Message unmatch = new Message(username, null, Status.EXIT);
-						bx.sendMessage(unmatch);
-						System.out.println("refused to send");
+						Message exit = new Message(username, null, Status.EXIT);
+						bx.sendMessage(exit);
 					}
 					removeMatched();
 					Server.listMatched.remove(username);
@@ -92,7 +90,9 @@ public class ServerHandler extends Thread {
 
 				case REFUSE:
 					ServerHandler b;
+					// Bỏ client từ chối vào rejectedlist
 					rejected.add(clientInfo);
+					// Lấy thông tin người bị từ chối
 					if (Server.listMatched.get(clientInfo) != null) {
 						b = Server.listMatched.get(clientInfo);
 					} else {
@@ -100,35 +100,35 @@ public class ServerHandler extends Thread {
 					}
 					Message unmatch = new Message(username, null, Status.UNMATCH);
 					b.sendMessage(unmatch);
-					System.out.println("refused to match");
-					
+
 					removeMatched();
-					
+					b.removeMatched();
+
 					if (Server.listWait.size() - 1 > rejected.size() && Server.secondClient.equals(username)) {
 						matching();
 					}
 					break;
-				
+
 				case MATCH:
 					matching();
 					break;
+
 				default:
 					if (Server.listMatched.get(received.getName()) != null
 							|| Server.listWait.get(received.getName()) != null) {
-						Message mess = new Message(username, null, Status.EXIST);
-						sendMessage(mess);
+						Message exist = new Message(username, null, Status.EXIST);
+						sendMessage(exist);
 					} else if (username == null) {
 						username = received.getName();
 						Server.listWait.put(username, this);
-						Message welcome = new Message(username, null, Status.CONNECTED);
-						System.out.println(welcome);
-						sendMessage(welcome);
+						Message connected = new Message(username, null, Status.CONNECTED);
+						sendMessage(connected);
 						Server.secondClient = username;
 						matching();
 					}
 				}
 			}
-			System.out.println("ServerHanlder: " + username + " has left!");
+			System.out.println("SERVER: " + username + " has left!");
 		} catch (IOException | ClassNotFoundException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -140,30 +140,35 @@ public class ServerHandler extends Thread {
 	}
 
 	public void matching() throws IOException, InterruptedException {
-		System.out.println("Room making with");
-		System.out.println(username);
 		synchronized (this) {
+			// kiểm tra listwait > 1
 			if (Server.listWait.size() > 1) {
 				Server.listWait.remove(username);
+				// Khai báo 1 list để chứa
 				ArrayList<ServerHandler> list = new ArrayList<>(Server.listWait.values());
+				// Xóa những người đã từng từ chối trước đó
 				list.removeIf(x -> rejected.contains(x.getUsername()));
+				// Trộn danh sách lên
 				Collections.shuffle(list);
+				// Lấy thông tin người đầu tiên
 				ServerHandler b = list.get(0);
 				setClientInfo(b.getUsername());
 				b.setClientInfo(username);
+				// Bỏ 2 thằng vào list matched
 				Server.listMatched.put(username, this);
 				Server.listMatched.put(b.getUsername(), b);
-				Message mess = new Message(clientInfo, null, Status.MATCH);
-				sendMessage(mess);
-				mess.setName(username);
-				b.sendMessage(mess);
+				Message match = new Message(clientInfo, null, Status.MATCH);
+				sendMessage(match);
+				// Set tên cho client thứ 2
+				match.setName(username);
+				b.sendMessage(match);
 				Server.listWait.remove(b.getUsername());
-				System.out.println("Room chat has been made");
 			}
 		}
 	}
 
 	public void removeMatched() {
+		// Kiểm tra đã có trong list match chưa
 		if (Server.listMatched.get(clientInfo) != null) {
 			ServerHandler b = Server.listMatched.get(clientInfo);
 			Server.listMatched.remove(clientInfo);

@@ -18,12 +18,12 @@ public class Server {
         try(ServerSocket serverSocket = new ServerSocket(1234);){
             Socket clienSocket ;
             while(true){
-                System.out.println("Server is running");
                 clienSocket = serverSocket.accept();
-                System.out.println("New client connect: " + clienSocket);
-                ObjectOutputStream ous = new ObjectOutputStream(clienSocket.getOutputStream());
-                ObjectInputStream ois = new ObjectInputStream(clienSocket.getInputStream());
-                ServerHandler newClient = new ServerHandler(clienSocket,ois,ous);
+                System.out.println("SERVER: Server is waiting for client");
+                System.out.println("SERVER: " + clienSocket);
+                ObjectOutputStream out = new ObjectOutputStream(clienSocket.getOutputStream());
+                ObjectInputStream in = new ObjectInputStream(clienSocket.getInputStream());
+                ServerHandler newClient = new ServerHandler(clienSocket,in,out);
                 Thread thread = new Thread(newClient);
                 thread.start();
             }

@@ -86,7 +86,6 @@ public class ClientForm extends JFrame {
 					try {
 						running = false;
 						Message send = new Message(null, null, Status.EXIT);
-						System.out.println(send);
 						client.sendMessage(send);
 						client.closeAll();
 					} catch (IOException e1) {
@@ -269,7 +268,6 @@ public class ClientForm extends JFrame {
 									// TODO Auto-generated method stub
 									try {
 										Message receivedMessage = client.receiveMessage();
-										System.out.println(receivedMessage);
 										switch (receivedMessage.getStatus()) {
 										case MATCH:
 											int action = JOptionPane.showConfirmDialog(null,
@@ -308,8 +306,6 @@ public class ClientForm extends JFrame {
 											client.setMatched(false);
 											btnEnd.setEnabled(false);
 											displayArea.setText("");
-											Message find = new Message(client.getName(), null, Status.MATCH);
-											client.sendMessage(find);
 											break;
 										case CONNECTED:
 											btnConnect.setEnabled(false);
@@ -320,7 +316,7 @@ public class ClientForm extends JFrame {
 										}
 
 									} catch (IOException | ClassNotFoundException e) {
-										System.out.println();
+										
 									}
 								}
 							}
@@ -331,7 +327,6 @@ public class ClientForm extends JFrame {
 				}
 			}
 		});
-
 		btnConnect.setBounds(294, 10, 85, 30);
 		insideCenter.add(btnConnect);
 
@@ -350,8 +345,6 @@ public class ClientForm extends JFrame {
 						client.setMatched(false);
 						btnEnd.setEnabled(false);
 						displayArea.setText("");
-						Message refuse = new Message(client.getName(), null, Status.MATCH);
-						client.sendMessage(refuse);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
